@@ -22,7 +22,7 @@ env:
   MY_IMAGE_DESC: "My Customized Universal Blue Image"
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}" # do not edit
   IMAGE_REGISTRY_UPSTREAM: "ghrc.io/ublue-os"
-  IMAGE_NAME_UPSTREAM: "ghrc.io/ublue-os"
+  IMAGE_NAME_UPSTREAM: "bazzite"
   DIGGEST_FILE: "DIGGEST.txt"
 
 jobs:

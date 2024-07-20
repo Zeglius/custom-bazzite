@@ -16,7 +16,7 @@ ARG SOURCE_REGISTRY="${SOURCE_REGISTRY:-ghcr.io/ublue-os}"
 # - "base"
 #
 #  "aurora", "bazzite", "bluefin" or "ucore" may also be used but have different suffixes.
-ARG SOURCE_IMAGE="${SOURCE_IMAGE:-bazzite-}"
+ARG SOURCE_IMAGE="${SOURCE_IMAGE:-bazzite}"
 
 ## SOURCE_SUFFIX arg should include a hyphen and the appropriate suffix name
 # These examples all work for silverblue/kinoite/sericea/onyx/lazurite/vauxite/base
@@ -42,7 +42,7 @@ ARG SOURCE_TAG="${SOURCE_TAG:-latest}"
 
 ### 2. SOURCE IMAGE
 ## this is a standard Containerfile FROM using the build ARGs above to select the right upstream image
-FROM ${SOURCE_REGISTRY}/${SOURCE_IMAGE}${SOURCE_SUFFIX}:${SOURCE_TAG}
+FROM ${SOURCE_REGISTRY}/${SOURCE_IMAGE}-${SOURCE_SUFFIX}:${SOURCE_TAG}
 
 
 ### 3. MODIFICATIONS
