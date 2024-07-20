@@ -54,20 +54,23 @@ jobs:
           [[ ! -f ${{ env.DIGGEST_FILE }} ]] && touch ${{ env.DIGGEST_FILE }}
           IMAGE_CACHE_DIG=$(cat ${{ env.DIGGEST_FILE }})
           IMAGE_UPSTREAM_DIG=$(skopeo inspect docker://ghcr.io/ublue-os/bazzite | jq '.Digest')
-          # Check which kind of event we are in a manual dispatch
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "cancel_job=false" >> ${GITHUB_OUTPUT}
-            exit
-          fi
-          if [[ "${IMAGE_CACHE_DIG}" == "${IMAGE_UPSTREAM_DIG}" ]]; then
-            # Cancel the rebuid
-            echo "cancel_job=true" >> ${GITHUB_OUTPUT}
-          else
-            # Update diggest and continue job
-            echo ${IMAGE_UPSTREAM_DIG} > ${{ env.DIGGEST_FILE }}
-            echo "cancel_job=false" >> ${GITHUB_OUTPUT}
-            echo "updated_diggest=true" >> ${GITHUB_OUTPUT}
-          fi
+          for a in 0; do
+            # Check which kind of event we are in a manual dispatch
+            if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+              echo "cancel_job=false" >> ${GITHUB_OUTPUT}
+              break
+            fi
+            if [[ "${IMAGE_CACHE_DIG}" == "${IMAGE_UPSTREAM_DIG}" ]]; then
+              # Cancel the rebuid
+              echo "cancel_job=true" >> ${GITHUB_OUTPUT}
+            else
+              # Update diggest and continue job
+              echo ${IMAGE_UPSTREAM_DIG} > ${{ env.DIGGEST_FILE }}
+              echo "cancel_job=false" >> ${GITHUB_OUTPUT}
+              echo "updated_diggest=true" >> ${GITHUB_OUTPUT}
+            fi
+          done
+          unset -v a
 
       # Update a
       - name: Add & Commit
