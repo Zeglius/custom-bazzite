@@ -59,7 +59,7 @@ jobs:
             echo "cancel_job=false" >> ${GITHUB_OUTPUT}
             exit
           fi
-          if [[ ${IMAGE_CACHE_DIG} == ${IMAGE_UPSTREAM_DIG} ]]; then
+          if [[ "${IMAGE_CACHE_DIG}" == "${IMAGE_UPSTREAM_DIG}" ]]; then
             # Cancel the rebuid
             echo "cancel_job=true" >> ${GITHUB_OUTPUT}
           else
