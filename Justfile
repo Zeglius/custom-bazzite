@@ -16,6 +16,6 @@ _init_docker_lima:
         limactl start docker
     fi
 
-act +ARGS="":
+act +ARGS="-n":
     just _init_docker_lima
     act {{ ARGS }}

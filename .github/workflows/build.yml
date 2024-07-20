@@ -40,12 +40,15 @@ jobs:
       id-token: write
 
     steps:
-      - name: Set up skopeo environment
-        uses: warjiang/setup-skopeo@v0.1.3
-
       # Checkout push-to-registry action GitHub repository
       - name: Checkout Push to Registry action
         uses: actions/checkout@v4
+
+      - name: Install Package
+        uses: ConorMacBride/install-package@v1.1.0
+        if: ${{ env.ACT }}
+        with:
+          apt: skopeo buildah
 
       # Check if an image rebuild is needed.
       # Rebuild should be triggered under the following conditions:
@@ -83,6 +86,7 @@ jobs:
 
       - name: Maximize build space
         uses: ublue-os/remove-unwanted-software@v7
+        continue-on-error: true
 
       - name: Generate tags
         id: generate-tags
@@ -128,6 +132,7 @@ jobs:
       - name: Image Metadata
         uses: docker/metadata-action@v5
         id: meta
+        continue-on-error: true
         with:
           images: |
             ${{ env.MY_IMAGE_NAME }}
@@ -149,7 +154,7 @@ jobs:
             ./Containerfile
           # Postfix image name with -custom to make it a little more descriptive
           # Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
-          image: ${{ env.MY_IMAGE_NAME }}
+          image: ${{ env.IMAGE_REGISTRY }}/${{ env.MY_IMAGE_NAME }}
           tags: |
             ${{ steps.generate-tags.outputs.alias_tags }}
           labels: ${{ steps.meta.outputs.labels }}
