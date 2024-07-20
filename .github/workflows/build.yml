@@ -5,24 +5,25 @@ on:
     branches:
       - main
   schedule:
-    - cron: '00 14 * * *'  # 14:00am UTC everyday
+    - cron: "00 14 * * *" # 14:00am UTC everyday
   push:
     branches:
       - main
     paths-ignore:
-      - '**/README.md'
-      - '.gitignore'
-      - 'Containerfile'
-      - 'LICENSE'
-      - 'README.md'
+      - "**/README.md"
+      - ".gitignore"
+      - "Containerfile"
+      - "LICENSE"
+      - "README.md"
   workflow_dispatch:
 
 env:
-  MY_IMAGE_NAME: "${{ github.event.repository.name }}"  # the name of the image produced by this build, matches repo names
+  MY_IMAGE_NAME: "${{ github.event.repository.name }}" # the name of the image produced by this build, matches repo names
   MY_IMAGE_DESC: "My Customized Universal Blue Image"
-  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
+  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}" # do not edit
   IMAGE_REGISTRY_UPSTREAM: "ghrc.io/ublue-os"
   IMAGE_NAME_UPSTREAM: "ghrc.io/ublue-os"
+  DIGGEST_FILE: "DIGGEST.txt"
 
 jobs:
   build_push:
@@ -44,15 +45,14 @@ jobs:
 
       # Check if an image rebuild is needed.
       # Rebuild should be triggered under the following conditions:
-      #   - If upstream diggest does not match latest_upstream_sha.txt contents
+      #   - If upstream diggest does not match DIGGEST.txt contents
       #   - If workflow was triggered manually (workflow_dispatch)
       - name: Check version trigger
         id: checkver
-        env:
-          VERSION_FILE: "latest_upstream_sha.txt"
         shell: bash
         run: |
-          IMAGE_CACHE_DIG=$(cat ${VERSION_FILE})
+          [[ ! -f ${{ env.DIGGEST_FILE }} ]] && touch ${{ env.DIGGEST_FILE }}
+          IMAGE_CACHE_DIG=$(cat ${{ env.DIGGEST_FILE }})
           IMAGE_UPSTREAM_DIG=$(skopeo inspect docker://ghcr.io/ublue-os/bazzite | jq '.Digest')
           # Check which kind of event we are in a manual dispatch
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
@@ -64,9 +64,17 @@ jobs:
             echo "cancel_job=true" >> ${GITHUB_OUTPUT}
           else
             # Update diggest and continue job
-            echo ${IMAGE_UPSTREAM_DIG} > ${VERSION_FILE}
+            echo ${IMAGE_UPSTREAM_DIG} > ${{ env.DIGGEST_FILE }}
             echo "cancel_job=false" >> ${GITHUB_OUTPUT}
+            echo "updated_diggest=true" >> ${GITHUB_OUTPUT}
           fi
+
+      # Update a
+      - name: Add & Commit
+        uses: EndBug/add-and-commit@v9.1.4
+        if: steps.checkver.outputs.updated_diggest == 'true'
+        with:
+          add: ${{ env.DIGGEST_FILE }}
 
       - name: Maximize build space
         uses: ublue-os/remove-unwanted-software@v7
