@@ -83,7 +83,6 @@ jobs:
 
       - name: Maximize build space
         uses: ublue-os/remove-unwanted-software@v7
-        if: steps.checkver.outputs.cancel_job == 'false'
 
       - name: Generate tags
         id: generate-tags
