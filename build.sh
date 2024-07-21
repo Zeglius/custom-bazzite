@@ -8,6 +8,7 @@ RELEASE="$(rpm -E %fedora)"
     # https://github.com/thesofproject/sof-bin
     cd "$(mktemp -d)"
     wget -o sof-bin.tar.gz \
+        -A "*.tar.gz" \
         https://github.com/thesofproject/sof-bin/releases/download/v2024.06/sof-bin-2024.06.tar.gz
     mkdir sof-bin
     tar -C sof-bin -xavf sof-bin.tar.gz --strip-components=1
