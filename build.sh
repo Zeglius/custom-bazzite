@@ -4,7 +4,6 @@ set -ouex pipefail
 
 RELEASE="$(rpm -E %fedora)"
 
-
 ### Install packages
 
 # Packages can be installed from any enabled yum repo on the image.
@@ -13,11 +12,23 @@ RELEASE="$(rpm -E %fedora)"
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/39/x86_64/repoview/index.html&protocol=https&redirect=1
 
 # this installs a package from fedora repos
-rpm-ostree install screen
+# rpm-ostree install screen
 
 # this would install a package from rpmfusion
 # rpm-ostree install vlc
 
 #### Example for enabling a System Unit File
 
-systemctl enable podman.socket
+# systemctl enable podman.socket
+
+## Install VM
+echo "::group::VM"
+rpm-ostree install -y \
+    virt-manager \
+    edk2-ovmf \
+    qemu \
+    libvirt
+echo "::endgroup::"
+
+echo "Finished executing ${0##*/}"
+exit 0
